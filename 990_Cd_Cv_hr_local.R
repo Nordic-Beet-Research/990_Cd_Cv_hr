@@ -234,5 +234,34 @@ write_xlsx(list(summary = dat_sum, full_data = dat_Cdv, Cv = dat_sum2, summ_stat
 ##############################
 # DANMARK
 
-access <-read.csv2("www/access.csv")
+# access <-read.csv2("www/access.csv")
+# 
+# source('R_query_api.R')
+# 
+# #Account data
+# username <- unlist(access["meteo_user"])
+# password <- unlist(access["meteo_pass"])
+# 
+# #Find out what the current account can do
+# # limits <- query_user_features(username, password)
+# # limits
+# 
+# #Set initial time data####
+# time_zone <- "Europe/Stockholm"
+# startdate <- ISOdatetime(year = as.integer("2022",'%Y'), 
+#                          month = as.integer("01",'%m'), 
+#                          day = as.integer("01",'%d'), 
+#                          hour = 00, min = 00, sec = 00, tz = "UTC")
+# enddate <- ISOdatetime(year = as.integer(strftime(today(),'%Y')), 
+#                        month = as.integer(strftime(today(),'%m')), 
+#                        day = as.integer(strftime(today(),'%d')), 
+#                        hour = 00, min = 00, sec = 00, tz = "UTC")
+# interval <- "PT1H"
+# 
+# parameters <- "t_2m:C"
+# coordinate <- "54.912747,11.199119+54.667524,11.45044+54.842805,11.916009+55.150173,11.917179+55.359515,11.751473+55.335240,10.356779"
+# 
+# ts_output <- timeseries(startdate, enddate, interval, parameters, coordinate)
+# head(ts_output)
 
+write_xlsx(list(full_data = ts_output), "Cd_Cv_2022_DK.xlsx")
