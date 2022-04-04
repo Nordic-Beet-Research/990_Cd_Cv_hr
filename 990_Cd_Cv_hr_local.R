@@ -31,7 +31,10 @@
                         "ggplot2_3.3.5",
                         "tidyr_1.1.4",
                         "writexl_1.4.0",
-                        "rdrop2_0.8.2.1"
+                        "rdrop2_0.8.2.1",
+                        "lubridate_1.8.0",
+                        "httr_1.4.2",
+                        "stringr_1.4.0"
   )
   path_Rpackages = "C:/R packages_412"
   # -------------------------------------------
@@ -173,10 +176,10 @@ dat_sum$såtid <- dates_summ
 dat_sum <- dat_sum %>%
   relocate(WSTNID, WSTN_namn, såtid, Cd, Cv)
 
-write_xlsx(list(summary = dat_sum, full_data = dat_Cdv, summ_stations = summ_stations, summ_sådatum = summ_dates, summ_report_date = data.frame(date_report)), 
-           "Cd_Cv_2022.xlsx")
-write_xlsx(list(summary = dat_sum, full_data = dat_Cdv, summ_stations = summ_stations, summ_sådatum = summ_dates, summ_report_date = data.frame(date_report)), 
-           "C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cd_Cv_2022.xlsx")
+# write_xlsx(list(summary = dat_sum, full_data = dat_Cdv, summ_stations = summ_stations, summ_sådatum = summ_dates, summ_report_date = data.frame(date_report)), 
+#            "Cd_Cv_2022.xlsx")
+# write_xlsx(list(summary = dat_sum, full_data = dat_Cdv, summ_stations = summ_stations, summ_sådatum = summ_dates, summ_report_date = data.frame(date_report)), 
+#            "C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cd_Cv_2022.xlsx")
 
 ##############################
 # IMAGE FOR WEBSITE
@@ -190,21 +193,23 @@ dat_sum2 <- dat_Cdv[,1:8] %>%
 
 doy <- yday(max(dat_sum2$DAY)) - yday(min(dat_sum2$DAY)) + 1
 WSTNID_summ <- rep(stations_names, each = doy)
-dat_sum2$WSTN_namn <- WSTNID_summ
+dat_sum2$Väderstationer <- WSTNID_summ
 
-Cv_jpg <- ggplot(dat_sum2, aes(x=DAY, y=Cv, group = WSTN_namn))+
-  geom_line(aes(color = WSTN_namn)) + 
+Cv_jpg <- ggplot(dat_sum2, aes(x=DAY, y=Cv, group = Väderstationer))+
+  geom_line(aes(color = Väderstationer, linetype = Väderstationer), size = 1) + 
   ggtitle(paste("VERNALISATIONSTIMMAR. Uppdaterad senast: ", endDate)) +
   theme(plot.title = element_text(hjust = 0.5),
-        axis.text.x = element_text(angle = 45)) +
-  labs(x="Sådatum", y= "Vernalisationstimmar",color = "Väderstationer") +
+        axis.text.x = element_text(angle = 45),
+        legend.position="bottom") +
+  labs(x="Sådatum", y= "Vernalisationstimmar", group = "Väderstationer") +
   scale_x_date(date_labels="%d %b",date_breaks  ="1 day") +
-  scale_y_continuous(breaks=seq(0,200,5))
+  scale_y_continuous(breaks=seq(0,200,5)) +
+  scale_linetype_manual(values = c("solid","twodash","dashed","solid","twodash","dashed","solid"))
 
 # PUT IN A LINE AT 120 AND 140 Cv WHEN IT IS TIME....
-# Cv_jpg
+Cv_jpg
 
-jpeg("C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cv.jpeg", units = "in", width = 11, height = 6, res = 700)
+jpeg("C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cv.jpeg", units = "in", width = 8, height = 5, res = 700)
 Cv_jpg
 dev.off()
 
@@ -217,11 +222,17 @@ write_xlsx(list(summary = dat_sum, full_data = dat_Cdv, Cv = dat_sum2, summ_stat
 
 ##############################
 
-drop_auth(rdstoken = "www/token.rds")
-drop_upload("Cd_Cv_2022.xlsx", path = "/Sockerbetor NBR/Sockerbetor 2022/Weather_data")
+# drop_auth(rdstoken = "www/token.rds")
+# drop_upload("Cd_Cv_2022.xlsx", path = "/Sockerbetor NBR/Sockerbetor 2022/Weather_data")
 
 # token <- drop_auth()
 # saveRDS(token, file = "www/token.rds")
 # # I THINK THAT IT'S THEN BEST TO DELETE THE .HTTR.TOKEN FILE (OR WHATEVER IT'S CALLED)
 # token <- readRDS("www/token.rds")
 # drop_upload("Cd_Cv_2022.xlsx", path = "/Sockerbetor NBR/Sockerbetor 2022/Weather_data", dtoken = token)
+
+##############################
+# DANMARK
+
+access <-read.csv2("www/access.csv")
+
