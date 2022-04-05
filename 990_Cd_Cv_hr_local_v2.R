@@ -36,7 +36,8 @@
                         "httr_1.4.2",
                         "stringr_1.4.0",
                         "vctrs_0.3.8",
-                        "png_0.1-7"
+                        "png_0.1-7",
+                        "readxl_1.3.1"
   )
   path_Rpackages = "C:/R packages_412"
   # -------------------------------------------
@@ -260,6 +261,10 @@ Cv_DK_jpg <- ggplot(dat_sum_DK, aes(x=DAY, y=Cv, group = Vejrstationer))+
 # Cv_DK_jpg
 
 jpeg("C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cv_DK.jpeg", units = "in", width = 7, height = 5, res = 700)
+Cv_DK_jpg
+dev.off()
+
+jpeg("Cv_DK.jpeg", units = "in", width = 7, height = 5, res = 700)
 Cv_DK_jpg
 dev.off()
 
