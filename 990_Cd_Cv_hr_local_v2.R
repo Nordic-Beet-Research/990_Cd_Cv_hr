@@ -36,8 +36,8 @@
                         "httr_1.4.2",
                         "stringr_1.4.0",
                         "vctrs_0.3.8",
-                        "png_0.1-7",
-                        "readxl_1.3.1"
+                        "png_0.1-7"#,
+                        #"readxl_1.3.1"
   )
   path_Rpackages = "C:/R packages_412"
   # -------------------------------------------
@@ -215,7 +215,7 @@ xmin = as.Date(max(dat_sum_SE$DAY))-3
 ymax = max(dat_sum_SE$Cv)
 ymin = max(dat_sum_SE$Cv)-8
 
-Cv_jpg <- ggplot(dat_sum_SE, aes(x=DAY, y=Cv, group = Väderstationer))+
+Cv_SE_jpg <- ggplot(dat_sum_SE, aes(x=DAY, y=Cv, group = Väderstationer))+
   geom_line(aes(color = Väderstationer, linetype = Väderstationer), size = 1) + 
   ggtitle(paste("VERNALISATIONSTIMMAR. Uppdaterad senast: ", endDate)) +
   theme(plot.title = element_text(hjust = 0.5),
@@ -231,11 +231,11 @@ Cv_jpg <- ggplot(dat_sum_SE, aes(x=DAY, y=Cv, group = Väderstationer))+
 # Cv_jpg
 
 jpeg("C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cv_SE.jpeg", units = "in", width = 7, height = 5, res = 700)
-Cv_jpg
+Cv_SE_jpg
 dev.off()
 
 jpeg("Cv_SE.jpeg", units = "in", width = 7, height = 5, res = 700)
-Cv_jpg
+Cv_SE_jpg
 dev.off()
 
 ## DENMARK
