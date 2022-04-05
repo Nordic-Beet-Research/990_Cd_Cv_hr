@@ -34,7 +34,9 @@
                         "rdrop2_0.8.2.1",
                         "lubridate_1.8.0",
                         "httr_1.4.2",
-                        "stringr_1.4.0"
+                        "stringr_1.4.0",
+                        "vctrs_0.3.8",
+                        "png_0.1-7"
   )
   path_Rpackages = "C:/R packages_412"
   # -------------------------------------------
@@ -195,6 +197,12 @@ doy <- yday(max(dat_sum2$DAY)) - yday(min(dat_sum2$DAY)) + 1
 WSTNID_summ <- rep(stations_names, each = doy)
 dat_sum2$Väderstationer <- WSTNID_summ
 
+img = readPNG("NBR_RGB.png")
+xmax = as.Date(max(dat_sum2$DAY))
+xmin = as.Date(max(dat_sum2$DAY))-3
+ymax = max(dat_sum2$Cv)
+ymin = max(dat_sum2$Cv)-8
+
 Cv_jpg <- ggplot(dat_sum2, aes(x=DAY, y=Cv, group = Väderstationer))+
   geom_line(aes(color = Väderstationer, linetype = Väderstationer), size = 1) + 
   ggtitle(paste("VERNALISATIONSTIMMAR. Uppdaterad senast: ", endDate)) +
@@ -204,12 +212,13 @@ Cv_jpg <- ggplot(dat_sum2, aes(x=DAY, y=Cv, group = Väderstationer))+
   labs(x="Sådatum", y= "Vernalisationstimmar", group = "Väderstationer") +
   scale_x_date(date_labels="%d %b",date_breaks  ="1 day") +
   scale_y_continuous(breaks=seq(0,200,5)) +
-  scale_linetype_manual(values = c("solid","twodash","dashed","solid","twodash","dashed","solid"))
+  scale_linetype_manual(values = c("solid","twodash","dashed","solid","twodash","dashed","solid")) +
+  annotation_custom(rasterGrob(img), xmax = xmax, xmin = xmin, ymax = ymax, ymin = ymin)
 
 # PUT IN A LINE AT 120 AND 140 Cv WHEN IT IS TIME....
-Cv_jpg
+# Cv_jpg
 
-jpeg("C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cv.jpeg", units = "in", width = 8, height = 5, res = 700)
+jpeg("C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cv_SE.jpeg", units = "in", width = 7, height = 5, res = 700)
 Cv_jpg
 dev.off()
 
@@ -234,34 +243,85 @@ write_xlsx(list(summary = dat_sum, full_data = dat_Cdv, Cv = dat_sum2, summ_stat
 ##############################
 # DANMARK
 
-# access <-read.csv2("www/access.csv")
-# 
-# source('R_query_api.R')
-# 
-# #Account data
-# username <- unlist(access["meteo_user"])
-# password <- unlist(access["meteo_pass"])
-# 
-# #Find out what the current account can do
-# # limits <- query_user_features(username, password)
-# # limits
-# 
-# #Set initial time data####
-# time_zone <- "Europe/Stockholm"
-# startdate <- ISOdatetime(year = as.integer("2022",'%Y'), 
-#                          month = as.integer("01",'%m'), 
-#                          day = as.integer("01",'%d'), 
-#                          hour = 00, min = 00, sec = 00, tz = "UTC")
-# enddate <- ISOdatetime(year = as.integer(strftime(today(),'%Y')), 
-#                        month = as.integer(strftime(today(),'%m')), 
-#                        day = as.integer(strftime(today(),'%d')), 
-#                        hour = 00, min = 00, sec = 00, tz = "UTC")
-# interval <- "PT1H"
-# 
-# parameters <- "t_2m:C"
-# coordinate <- "54.912747,11.199119+54.667524,11.45044+54.842805,11.916009+55.150173,11.917179+55.359515,11.751473+55.335240,10.356779"
-# 
-# ts_output <- timeseries(startdate, enddate, interval, parameters, coordinate)
-# head(ts_output)
+access <-read.csv2("www/access.csv")
 
-write_xlsx(list(full_data = ts_output), "Cd_Cv_2022_DK.xlsx")
+source('R_query_api.R')
+
+#Account data
+username <- unlist(access["meteo_user"])
+password <- unlist(access["meteo_pass"])
+
+#Find out what the current account can do
+# limits <- query_user_features(username, password)
+# limits
+
+#Set initial time data####
+time_zone <- "Europe/Stockholm"
+startdate <- ISOdatetime(year = as.integer("2022",'%Y'),
+                         month = as.integer("01",'%m'),
+                         day = as.integer("01",'%d'),
+                         hour = 00, min = 00, sec = 00, tz = "UTC")
+enddate <- ISOdatetime(year = as.integer(strftime(today(),'%Y')),
+                       month = as.integer(strftime(today(),'%m')),
+                       day = as.integer(strftime(today(),'%d')),
+                       hour = 00, min = 00, sec = 00, tz = "UTC")
+interval <- "PT1H"
+
+parameters <- "t_2m:C"
+station_names_dk <- c("Horslunde", "Lungholm", "Eskilstrup", "Snesere", "Glumsø", "Odense S")
+station_lat_dk <- c(54.912747,54.667524,54.842805,55.150173,55.359515,55.335240)
+station_long_dk <- c(11.199119,11.450440,11.916009,11.917179,11.751473,10.356779)
+coordinate <- paste0(c(rbind(station_lat_dk, ",", station_long_dk, "+")), collapse = "")
+coordinates <- data.frame("WSTN_namn" = station_names_dk, "lat" = station_lat_dk, "long" = station_long_dk)
+# 
+# dat_in_dk <- timeseries(startdate, enddate, interval, parameters, coordinate)
+# head(dat_in_dk)
+# 
+# write_xlsx(list(full_data = dat_in_dk), "Cd_Cv_2022_DK.xlsx")
+
+dat_in_dk <- read_xlsx("Cd_Cv_2022_DK.xlsx")
+
+dat_j_dk <- dat_in_dk %>%
+  rename(TM = "t_2m:C") %>%
+  group_by(lat) %>%
+  mutate(Cd_timvis = ifelse(TM < Cd_base, 0, TM-Cd_base)/24) %>% # Degree days
+  mutate(Cv_timvis = -1.256 + (1.26 + 0.131*TM)*0.9357^TM) %>% ## Vernalisation per hour
+  mutate(Cv_timvis = ifelse(Cv_timvis < 0, 0, Cv_timvis)) %>% # remove negative Cvs
+  mutate(Cd_0 = cumsum(Cd_timvis)) %>% ## Cumulative values
+  mutate(Cv_0 = cumsum(Cv_timvis)) %>% ## Cumulative values
+  left_join(coordinates, by = "lat")
+
+dat_sum3 <- dat_j_dk %>%
+  mutate(HOUR = hour(ymd_hms(validdate))) %>%
+  mutate(DAY = date(ymd_hms(validdate))) %>%
+  filter(HOUR == 23) %>%
+  filter(DAY > "2022-03-12") %>%
+  group_by(WSTN_namn) %>%
+  mutate(Cv = -1*(Cv_0- max(Cv_0))) %>%
+  filter(DAY < "2022-04-05") %>%
+  rename("Väderstationer" = "WSTN_namn")
+
+img = readPNG("NBR_RGB.png")
+xmax = as.Date(max(dat_sum2$DAY))
+xmin = as.Date(max(dat_sum2$DAY))-3
+ymax = max(dat_sum2$Cv)
+ymin = max(dat_sum2$Cv)-8
+
+Cv_DK_jpg <- ggplot(dat_sum3, aes(x=DAY, y=Cv, group = Väderstationer))+
+  geom_line(aes(color = Väderstationer, linetype = Väderstationer), size = 1) + 
+  ggtitle(paste("VERNALISATIONSTIMMAR. Uppdaterad senast: ", endDate)) +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.text.x = element_text(angle = 45),
+        legend.position="bottom") +
+  labs(x="Sådatum", y= "Vernalisationstimmar", group = "Väderstationer") +
+  scale_x_date(date_labels="%d %b",date_breaks  ="1 day") +
+  scale_y_continuous(breaks=seq(0,200,5)) +
+  scale_linetype_manual(values = c("solid","twodash","dashed","solid","twodash","dashed","solid")) +
+  annotation_custom(rasterGrob(img), xmax = xmax, xmin = xmin, ymax = ymax, ymin = ymin)
+
+# PUT IN A LINE AT 120 AND 140 Cv WHEN IT IS TIME....
+#Cv_DK_jpg
+
+jpeg("C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cv_DK.jpeg", units = "in", width = 8, height = 5, res = 700)
+Cv_DK_jpg
+dev.off()
