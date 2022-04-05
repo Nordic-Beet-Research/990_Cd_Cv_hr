@@ -153,10 +153,10 @@ access <-read.csv2("www/access.csv")
 username <- unlist(access["meteo_user"])
 password <- unlist(access["meteo_pass"])
  
-# dat_in_DK <- timeseries(startdate, enddate, interval, parameters, coordinate)
+dat_in_DK <- timeseries(startdate, enddate, interval, parameters, coordinate)
 # write_xlsx(list(full_data = dat_in_DK), "Cd_Cv_2022_DK.xlsx")
 
-dat_in_DK <- read_xlsx("Cd_Cv_2022_DK.xlsx")
+# dat_in_DK <- read_xlsx("Cd_Cv_2022_DK.xlsx")
 
 
 ## COMBINE
@@ -234,6 +234,9 @@ jpeg("C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cv_SE.jpeg", unit
 Cv_jpg
 dev.off()
 
+jpeg("Cv_SE.jpeg", units = "in", width = 7, height = 5, res = 700)
+Cv_jpg
+dev.off()
 
 ## DENMARK
 dat_sum_DK <- dat_sum %>%
@@ -272,9 +275,9 @@ dev.off()
 ############################################
 
 write_xlsx(list(summary = dat_sum, full_data = dat, summ_stations = summ_stations, summ_sådatum = summ_dates, summ_report_date = data.frame(date_report)), 
-           "Cd_Cv_2022.xlsx")
-write_xlsx(list(summary = dat_sum, full_data = dat, summ_stations = summ_stations, summ_sådatum = summ_dates, summ_report_date = data.frame(date_report)), 
            "C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cd_Cv_2022.xlsx")
+write_xlsx(list(summary = dat_sum, full_data = dat, summ_stations = summ_stations, summ_sådatum = summ_dates, summ_report_date = data.frame(date_report)), 
+           "Cd_Cv_2022.xlsx")
 
 ##############################
 
