@@ -36,8 +36,9 @@
                         "httr_1.4.2",
                         "stringr_1.4.0",
                         "vctrs_0.3.8",
-                        "png_0.1-7"#,
-                        #"readxl_1.3.1"
+                        "png_0.1-7",
+                        "readxl_1.3.1",
+                        "grid_4.1.2"
   )
   path_Rpackages = "C:/R packages_412"
   # -------------------------------------------
@@ -198,6 +199,19 @@ dat_sum <- dat %>%
 
 ############################################
 ############################################
+# Add in historic
+dat_in_SE_hist <- read_xlsx("Cd_Cv_year_aves.xlsx")
+
+dat_in_SE_hist <- dat_in_SE_hist %>%
+  transmute(DAY = as.IDate(DAY), Cv = All_2018, WSTN_namn = "2016-21", land = "SE") %>%
+  mutate(Cv = Cv - Cv[which(DAY == endDate)]) %>%
+  filter(DAY < "2022-04-05")
+
+dat_sum <- dat_sum %>%
+  bind_rows(dat_in_SE_hist) 
+
+############################################
+############################################
 # Data for 118
 
 ############################################
@@ -214,6 +228,7 @@ xmax = as.Date(max(dat_sum_SE$DAY))
 xmin = as.Date(max(dat_sum_SE$DAY))-3
 ymax = max(dat_sum_SE$Cv)
 ymin = max(dat_sum_SE$Cv)-8
+ytext = max(dat_sum_SE$Cv[which(dat_sum_SE$Väderstationer == "2016-21")])-5
 
 Cv_SE_jpg <- ggplot(dat_sum_SE, aes(x=DAY, y=Cv, group = Väderstationer))+
   geom_line(aes(color = Väderstationer, linetype = Väderstationer), size = 1) + 
@@ -224,11 +239,12 @@ Cv_SE_jpg <- ggplot(dat_sum_SE, aes(x=DAY, y=Cv, group = Väderstationer))+
   labs(x="Sådatum", y= "Vernalisationstimmar", group = "Väderstationer") +
   scale_x_date(date_labels="%d %b",date_breaks  ="1 day") +
   scale_y_continuous(breaks=seq(0,200,5)) +
-  scale_linetype_manual(values = c("solid","twodash","dashed","solid","twodash","dashed","solid")) +
-  annotation_custom(rasterGrob(img), xmax = xmax, xmin = xmin, ymax = ymax, ymin = ymin)
+  scale_linetype_manual(values = c("solid","solid","twodash","dashed","solid","twodash","dashed","solid")) +
+  annotation_custom(rasterGrob(img), xmax = xmax, xmin = xmin, ymax = ymax, ymin = ymin) +
+  geom_text(x = as.IDate("2022-03-16"), y = ytext, label = "Medel 2016-2021", angle = -28, size = 3)
 
 # PUT IN A LINE AT 120 AND 140 Cv WHEN IT IS TIME....
-# Cv_jpg
+#Cv_SE_jpg
 
 jpeg("C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cv_SE.jpeg", units = "in", width = 7, height = 5, res = 700)
 Cv_SE_jpg
