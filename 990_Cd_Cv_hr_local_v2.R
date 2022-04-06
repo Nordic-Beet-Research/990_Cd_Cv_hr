@@ -155,7 +155,7 @@ username <- unlist(access["meteo_user"])
 password <- unlist(access["meteo_pass"])
  
 dat_in_DK <- timeseries(startdate, enddate, interval, parameters, coordinate)
-# write_xlsx(list(full_data = dat_in_DK), "Cd_Cv_2022_DK.xlsx")
+write_xlsx(list(full_data = dat_in_DK), "Cd_Cv_2022_DK.xlsx")
 
 # dat_in_DK <- read_xlsx("Cd_Cv_2022_DK.xlsx")
 
@@ -244,7 +244,7 @@ Cv_SE_jpg <- ggplot(dat_sum_SE, aes(x=DAY, y=Cv, group = Väderstationer))+
   geom_text(x = as.IDate("2022-03-16"), y = ytext, label = "Medel 2016-2021", angle = -28, size = 3)
 
 # PUT IN A LINE AT 120 AND 140 Cv WHEN IT IS TIME....
-#Cv_SE_jpg
+# Cv_SE_jpg
 
 jpeg("C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cv_SE.jpeg", units = "in", width = 7, height = 5, res = 700)
 Cv_SE_jpg
@@ -253,6 +253,9 @@ dev.off()
 jpeg("Cv_SE.jpeg", units = "in", width = 7, height = 5, res = 700)
 Cv_SE_jpg
 dev.off()
+
+# https://express.adobe.com/tools/image-resize/#
+
 
 ## DENMARK
 dat_sum_DK <- dat_sum %>%
@@ -286,6 +289,8 @@ dev.off()
 jpeg("Cv_DK.jpeg", units = "in", width = 7, height = 5, res = 700)
 Cv_DK_jpg
 dev.off()
+
+# https://express.adobe.com/tools/image-resize/#
 
 ############################################
 ############################################
