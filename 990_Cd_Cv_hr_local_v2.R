@@ -153,11 +153,12 @@ source('R_query_api.R')
 access <-read.csv2("www/access.csv")
 username <- unlist(access["meteo_user"])
 password <- unlist(access["meteo_pass"])
- 
+
+print("WAIT!!") 
 dat_in_DK <- timeseries(startdate, enddate, interval, parameters, coordinate)
 write_xlsx(list(full_data = dat_in_DK), "Cd_Cv_2022_DK.xlsx")
 
-# dat_in_DK <- read_xlsx("Cd_Cv_2022_DK.xlsx")
+#dat_in_DK <- read_xlsx("Cd_Cv_2022_DK.xlsx")
 
 
 ## COMBINE
@@ -193,7 +194,7 @@ dat_sum <- dat %>%
   filter(DAY > "2022-03-12") %>%
   group_by(WSTNID) %>%
   mutate(Cv = -1*(Cv_0- max(Cv_0))) %>%
-  filter(DAY < "2022-04-05") %>%
+  filter(DAY < "2022-04-06") %>%
   ungroup()
 
 
@@ -205,7 +206,7 @@ dat_in_SE_hist <- read_xlsx("Cd_Cv_year_aves.xlsx")
 dat_in_SE_hist <- dat_in_SE_hist %>%
   transmute(DAY = as.IDate(DAY), Cv = All_2018, WSTN_namn = "2016-21", land = "SE") %>%
   mutate(Cv = Cv - Cv[which(DAY == endDate)]) %>%
-  filter(DAY < "2022-04-05")
+  filter(DAY < "2022-04-06")
 
 dat_sum <- dat_sum %>%
   bind_rows(dat_in_SE_hist) 
@@ -232,11 +233,11 @@ ytext = max(dat_sum_SE$Cv[which(dat_sum_SE$Väderstationer == "2016-21")])-5
 
 Cv_SE_jpg <- ggplot(dat_sum_SE, aes(x=DAY, y=Cv, group = Väderstationer))+
   geom_line(aes(color = Väderstationer, linetype = Väderstationer), size = 1) + 
-  ggtitle(paste("VERNALISATIONSTIMMAR. Uppdaterad senast: ", endDate)) +
+  ggtitle(paste("VERNALISATIONSTIMMAR. Uppdaterad senast: ", endDate+1)) +
   theme(plot.title = element_text(hjust = 0.5),
         axis.text.x = element_text(angle = 45),
         legend.position="bottom") +
-  labs(x="Sådatum", y= "Vernalisationstimmar", group = "Väderstationer") +
+  labs(x="Sådatum", y= "Vernalisationstimmar", group = "Väderstationer", caption = "Källa väderdata: LantMet") +
   scale_x_date(date_labels="%d %b",date_breaks  ="1 day") +
   scale_y_continuous(breaks=seq(0,200,5)) +
   scale_linetype_manual(values = c("solid","solid","twodash","dashed","solid","twodash","dashed","solid")) +
@@ -244,7 +245,7 @@ Cv_SE_jpg <- ggplot(dat_sum_SE, aes(x=DAY, y=Cv, group = Väderstationer))+
   geom_text(x = as.IDate("2022-03-16"), y = ytext, label = "Medel 2016-2021", angle = -28, size = 3)
 
 # PUT IN A LINE AT 120 AND 140 Cv WHEN IT IS TIME....
-# Cv_SE_jpg
+#Cv_SE_jpg
 
 jpeg("C:/Dropbox/Sockerbetor NBR/Sockerbetor 2022/Weather_data/Cv_SE.jpeg", units = "in", width = 7, height = 5, res = 700)
 Cv_SE_jpg
@@ -254,7 +255,7 @@ jpeg("Cv_SE.jpeg", units = "in", width = 7, height = 5, res = 700)
 Cv_SE_jpg
 dev.off()
 
-# https://express.adobe.com/tools/image-resize/#
+browseURL("https://express.adobe.com/tools/image-resize", browser = "C:/Program Files/Google/Chrome/Application/chrome.exe")
 
 
 ## DENMARK
@@ -269,11 +270,11 @@ ymin = max(dat_sum_DK$Cv)-8
 
 Cv_DK_jpg <- ggplot(dat_sum_DK, aes(x=DAY, y=Cv, group = Vejrstationer))+
   geom_line(aes(color = Vejrstationer, linetype = Vejrstationer), size = 1) + 
-  ggtitle(paste("VERNALISATIONSTIMER. Sidst opdateret d.: ", endDate)) +
+  ggtitle(paste("VERNALISATIONSTIMER. Sidst opdateret d.: ", endDate+1)) +
   theme(plot.title = element_text(hjust = 0.5),
         axis.text.x = element_text(angle = 45),
         legend.position="bottom") +
-  labs(x="Sådato", y= "Vernalisationstimer", group = "Vejrstationer") +
+  labs(x="Sådato", y= "Vernalisationstimer", group = "Vejrstationer", caption = "Kilde vejrdata: Meteomatics") +
   scale_x_date(date_labels="%d %b",date_breaks  ="1 day") +
   scale_y_continuous(breaks=seq(0,200,5)) +
   scale_linetype_manual(values = c("solid","twodash","dashed","solid","twodash","dashed")) +
@@ -290,7 +291,9 @@ jpeg("Cv_DK.jpeg", units = "in", width = 7, height = 5, res = 700)
 Cv_DK_jpg
 dev.off()
 
-# https://express.adobe.com/tools/image-resize/#
+
+browseURL("https://express.adobe.com/tools/image-resize", browser = "C:/Program Files/Google/Chrome/Application/chrome.exe")
+browseURL("https://www.meran.se/wp-login.php", browser = "C:/Program Files/Google/Chrome/Application/chrome.exe")
 
 ############################################
 ############################################
